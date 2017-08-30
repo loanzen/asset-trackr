@@ -25,6 +25,16 @@ class AssetTrackrClient(object):
 
         return AttrDict(response.json())
 
+    def list_all_devices(self):
+        url = '{0}/assets/list_all_assets/auth_type/basic'.format(self.BASE_URL)
+        headers = {
+            'content-type': "application/x-www-form-urlencoded",
+            'Authorization': 'Basic %s' % b64encode(self.username + ":" + self.password)
+        }
+        response = requests.request("POST", url, headers=headers)
+
+        return AttrDict(response.json())['success']
+
     def locate(self, serial_no):
         url = '{0}/assets/locate/sn/{1}/auth_type/basic'.format(self.BASE_URL, str(serial_no))
         headers = {'Authorization': 'Basic %s' % b64encode(self.username + ":" + self.password)}
@@ -44,7 +54,7 @@ class AssetTrackrClient(object):
         headers = {'Authorization': 'Basic %s' % b64encode(self.username + ":" + self.password)}
         response = requests.request("GET", url, headers=headers)
 
-        return AttrDict(response.json())
+        return AttrDict(response.json())['result']
 
     def create_geofence(self, serial_no, callback_url, fences):
         url = '{0}/assets/geofence/auth_type/basic'.format(self.BASE_URL)
