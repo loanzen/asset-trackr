@@ -5,7 +5,9 @@ from setuptools import setup
 
 
 requirements = [
-    "requests"
+    "requests",
+    "arrow",
+    "attrdict"
 ]
 
 setup(
