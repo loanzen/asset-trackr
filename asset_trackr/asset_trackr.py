@@ -13,6 +13,8 @@ class AssetTrackrClient(object):
     def __init__(self, **kwargs):
         self.username = kwargs.get('username', None)
         self.password = kwargs.get('password', None)
+        if not self.username or not self.password:
+            raise Exception('username or password not defined')
         self.headers = {
             'content-type': "application/x-www-form-urlencoded",
             'Authorization': 'Basic %s' % b64encode(self.username + ":" + self.password)
