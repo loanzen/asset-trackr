@@ -10,16 +10,19 @@ import requests
 
 
 class AssetTrackrClient(object):
+
     def __init__(self, **kwargs):
         self.username = kwargs.get('username', None)
         self.password = kwargs.get('password', None)
+        self.BASE_URL = "http://www.assettrackr.com"
+
+    def get_headers(self):
         if not self.username or not self.password:
             raise Exception('username or password not defined')
-        self.headers = {
+        return {
             'content-type': "application/x-www-form-urlencoded",
             'Authorization': 'Basic %s' % b64encode(self.username + ":" + self.password)
         }
-        self.BASE_URL = "http://www.assettrackr.com"
 
     def add_new_device(self, serial_no, name):
         url = '{0}/assets/add_asset/auth_type/basic'.format(self.BASE_URL)
@@ -28,26 +31,26 @@ class AssetTrackrClient(object):
             "sn": serial_no,
             "name": name,
         })
-        response = requests.request("POST", url, headers=self.headers, data=payload)
+        response = requests.request("POST", url, headers=self.get_headers(), data=payload)
 
         return AttrDict(response.json())
 
     def list_all_devices(self):
         url = '{0}/assets/list_all_assets/auth_type/basic'.format(self.BASE_URL)
 
-        response = requests.request("POST", url, headers=self.headers)
+        response = requests.request("POST", url, headers=self.get_headers())
 
         return AttrDict(response.json())['success']
 
     def locate(self, serial_no):
         url = '{0}/assets/locate/sn/{1}/auth_type/basic'.format(self.BASE_URL, str(serial_no))
-        response = requests.request("GET", url, headers=self.headers)
+        response = requests.request("GET", url, headers=self.get_headers())
 
         return AttrDict(response.json())
 
     def trip(self, serial_no, date):
         url = '{0}/assets/trip/sn/{1}/date/{2}/auth_type/basic'.format(self.BASE_URL, str(serial_no), date)
-        response = requests.request("GET", url, headers=self.headers)
+        response = requests.request("GET", url, headers=self.get_headers())
 
         return AttrDict(response.json())
 
@@ -69,7 +72,7 @@ class AssetTrackrClient(object):
 
     def history(self, serial_no, start_utime_local, end_utime_local):
         url = '{0}/assets/stretch/sn/{1}/start_utime_local/{2}/end_utime_local/{3}/auth_type/basic'.format(self.BASE_URL, str(serial_no), start_utime_local, end_utime_local)
-        response = requests.request("GET", url, headers=self.headers)
+        response = requests.request("GET", url, headers=self.get_headers())
         return AttrDict(self.convert_history_format(response.json()))['result']
 
     def create_geofence(self, serial_no, callback_url, fences):
@@ -79,6 +82,6 @@ class AssetTrackrClient(object):
             "callback_url": callback_url,
             "fences": fences,
         })
-        response = requests.request("POST", url, headers=self.headers, data=payload)
+        response = requests.request("POST", url, headers=self.get_headers(), data=payload)
 
         return AttrDict(response.json())
